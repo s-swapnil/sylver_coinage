@@ -5,7 +5,7 @@ import java.util.*;
 
 public class Main {
 
-    final static int MAX_N=7;
+    final static int MAX_N=10;
     final static int SHOW_PERMS=1;
     final static ArrayList<ArrayList<Integer>> ANS_LIST=new ArrayList<>();
     final static ArrayList<Integer> realAns=new ArrayList<>();
@@ -15,8 +15,9 @@ public class Main {
 
         AddRealAns();
 
-//        WayMonteCarlo();
-        WayNewCalculate();
+
+        WayMonteCarlo();
+//        WayNewCalculate();
 //        WaySmartGenerate();
 
     }
@@ -70,12 +71,13 @@ public class Main {
 
     static void WayNewCalculate()
     {
-        int a[]=new int[MAX_N];
+        ArrayList<Integer> a=new ArrayList<>();
         for (int i=0;i<MAX_N;i++)
         {
-            a[i]=i+1;
+            a.add(i+1);
         }
-        heapPermutation(a, a.length, a.length);
+
+        heapPermutation(a, a.size());
 
         ANS_LIST.sort(new Comparator<ArrayList<Integer>>() {
             @Override
@@ -111,32 +113,32 @@ public class Main {
 
     static void WayMonteCarlo()
     {
-//        int b[]=new int[10];
-//        for (int k=0;k<10;k++)
-//        {
-//            ArrayList<Integer> sample=new ArrayList<>();
-//            for (int i=0;i<MAX_N;i++)
-//            {
-//                sample.add(i+1);
-//            }
-//            int cnt=0;
-//            int total_trials=1000000;
-//            for (int i=0;i<total_trials;i++)
-//            {
-//                Collections.shuffle(sample);
-//                ArrayList<Integer> x=new ArrayList<>();
-//                for (int j=0;j<MAX_N;j++)
-//                {
-//                    x.add(j,sample.get(j));
-//                }
-//
-//                if (validPerm(x,MAX_N)) cnt++;
-//            }
-//            double percent=(double) cnt/total_trials;
-//            double approx=percent*factorial(MAX_N);
-//            b[k]=(int)approx;
-//        }
-//        CalcMeanVar(b,10);
+        int b[]=new int[10];
+        for (int k=0;k<10;k++)
+        {
+            ArrayList<Integer> sample=new ArrayList<>();
+            for (int i=0;i<MAX_N;i++)
+            {
+                sample.add(i+1);
+            }
+            int cnt=0;
+            int total_trials=1000000;
+            for (int i=0;i<total_trials;i++)
+            {
+                Collections.shuffle(sample);
+                ArrayList<Integer> x=new ArrayList<>();
+                for (int j=0;j<MAX_N;j++)
+                {
+                    x.add(j,sample.get(j));
+                }
+
+                if (validPerm(x)) cnt++;
+            }
+            double percent=(double) cnt/total_trials;
+            double approx=percent*factorial(MAX_N);
+            b[k]=(int)approx;
+        }
+        CalcMeanVar(b,10);
     }
 
     static void CalcMeanVar(int arr[],int n)
@@ -173,18 +175,18 @@ public class Main {
 
 
     }
-    static boolean validPerm(int a[],int n)
+    static boolean validPerm(ArrayList<Integer> a)
     {
         TreeSet<Integer> possible=new TreeSet<>();
         Set<Integer> visited=new HashSet<>();
         possible.add(0);
 
-        for (int i=0;i<n;i++)
+        for (int i=0;i<a.size();i++)
         {
-            int num=a[i];
+            int num=a.get(i);
             visited.add(num);
             Integer temp=possible.first();
-            while (temp!=null && temp<=n)
+            while (temp!=null && temp<=a.size())
             {
                 if (!visited.contains(temp)&&temp!=0)
                 {
@@ -198,49 +200,47 @@ public class Main {
     }
 
     // Prints the array
-    static void addAns(int a[], int n)
+    static void addAns(ArrayList<Integer> a)
     {
         if (SHOW_PERMS==1)
         {
-            ArrayList<Integer> ans=new ArrayList<Integer>();
-            for (int i = 0; i < n; i++)
-            {
-                ans.add(a[i]);
-            }
-            ANS_LIST.add(ans);
+            ANS_LIST.add((ArrayList<Integer>) a.clone());
         }
         total_count++;
     }
 
     // Generating permutation using Heap Algorithm
-    static void heapPermutation(int a[], int size, int n)
+    static void heapPermutation(ArrayList<Integer> a, int size)
     {
+
         // if size becomes 1 then prints the obtained
         // permutation
         if (size == 1)
         {
-            if (validPerm(a,n))
-            addAns(a, n);
+            if (validPerm(a))
+            {
+                addAns(a);
+            }
         }
 
 
         for (int i = 0; i < size; i++) {
-            heapPermutation(a, size - 1, n);
+            heapPermutation(a, size - 1);
 
             // if size is odd, swap 0th i.e (first) and
             // (size-1)th i.e (last) element
             if (size % 2 == 1) {
-                int temp = a[0];
-                a[0] = a[size - 1];
-                a[size - 1] = temp;
+                int temp = a.get(0);
+                a.set(0, a.get(size - 1));
+                a.set(size - 1, temp);
             }
 
             // If size is even, swap ith
             // and (size-1)th i.e last element
             else {
-                int temp = a[i];
-                a[i] = a[size - 1];
-                a[size - 1] = temp;
+                int temp = a.get(i);
+                a.set(i, a.get(size - 1));
+                a.set(size - 1, temp);
             }
         }
     }
